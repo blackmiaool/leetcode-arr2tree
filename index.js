@@ -14,10 +14,11 @@ function fromArr(arr) {
     arr.forEach((val) => {
         const node = new TreeNode(val);
         const cb = cbList.shift();
-        cb(node);
+        
         if (val === null) {
             return;
         }
+        cb(node);
 
         cbList.push((n) => node.left = n);
         cbList.push((n) => node.right = n);
@@ -45,7 +46,7 @@ function getMaxMin(root) {
     let max = -Infinity;
     let min = Infinity;
     function traverse(node) {
-        if(node.val!==null){
+        if (node.val !== null) {
             if (node.val > max) {
                 max = node.val;
             }
@@ -53,7 +54,7 @@ function getMaxMin(root) {
                 min = node.val;
             }
         }
-        
+
         if (node.left) {
             traverse(node.left);
         }
@@ -65,35 +66,28 @@ function getMaxMin(root) {
     return { max, min };
 }
 function val2str(val, width) {
-    if(val===null){
+    if (val === null) {
         return ' '.repeat(width);
     }
-    val=val+'';
-
-    const spaces=width-val.length;
-    if(spaces%2){        
-        val=' '.repeat((spaces-1)/2)+val+' '.repeat((spaces+1)/2);
-    }else {
-        val=' '.repeat(spaces/2)+val+' '.repeat(spaces/2);
+    val = val + '';
+    const spaces = width - val.length;
+    if (spaces % 2) {
+        val = ' '.repeat((spaces - 1) / 2) + val + ' '.repeat((spaces + 1) / 2);
+    } else {
+        val = ' '.repeat(spaces / 2) + val + ' '.repeat(spaces / 2);
     }
     return val;
 }
-function print(arr) {
-    const tree = fromArr(arr);
-    console.log('tree', tree);
-    const treeHeight = getHeight(tree);
-    const { min, max } = getMaxMin(tree);
-    
-    const width = Math.max((min + '').length, (max + '').length);
-
-    const allNodes = [];
+function getAllNodes(tree, treeHeight, width) {
+    let allNodes = [];
     function traverse(node, height) {
         height++;
         const layerIndex = height - 1;
         if (!allNodes[layerIndex]) {
             allNodes[layerIndex] = [];
         }
-        allNodes[layerIndex].push(val2str(node && node.val, width));
+        // allNodes[layerIndex].push(val2str(node && node.val, width));
+        allNodes[layerIndex].push(node);
         if (height >= treeHeight)
             return;
 
@@ -102,20 +96,76 @@ function print(arr) {
 
     }
     traverse(tree, 0);
-    console.log('allNodes', allNodes);
-    drawAllNodes(allNodes);
+    return allNodes;
 }
-function drawAllNodes(arr) {
-    for (let i = arr.length - 1; i >= 0; i--) {
-        const line = arr[i];
-        console.log(line.join(' '));
-        // for(let j=0;j<line.length;j++){
-        //     const val=line[j];
-        //     console.log(val);
-        // }
-    }
+function print(arr) {
+    const tree = fromArr(arr);
+    const treeHeight = getHeight(tree);
+    const { min, max } = getMaxMin(tree);
+
+    const width = Math.max((min + '').length, (max + '').length);
+
+    const allNodes = getAllNodes(tree, treeHeight, width);
+    drawAllNodes(allNodes, treeHeight, width);
 }
-print([1, 5, 2, 3, 4, null, 3]);
+function space(num) {
+    return ' '.repeat(num);
+}
+function drawAllNodes(allNodes, treeHeight, unitWidth) {
+    treeHeight--;
+    const w = unitWidth;
+    const hw = Math.ceil(w / 2);//halfWidth
+    // function renderNode(value, unitWidth) {
+    //     if (value === null) {
+    //         value = ' ';
+    //     }
+    //     let ret = value + '';
+    //     const zeros = (unitWidth - ret.length) / 2;
+    //     return space(Math.ceil(zeros / 2)) + ret + space(Math.floor(zeros / 2));
+    // }
+    const outputBuffer=[];
+    const lineLength=Math.pow(2,allNodes.length-1)*(w+1);
+    const lineSpace=space(lineLength).split('');
+    allNodes.forEach((line, floor) => {
+        let times = treeHeight - floor - 1 > -1 ? Math.pow(2, treeHeight - floor - 1) : 0;
+        // console.log('floor',floor,times);
+        let startDistance;
+        let gap;
+        if (floor === treeHeight) {
+            startDistance = 0;
+            gap = 1;
+        } else {
+            startDistance = Math.ceil(times * w + times - 1 + 0.5 - w / 2);
+            times *= 2;
+            gap = times * w + (times - 1) + 1 - w;
+        }
+        let output = space(startDistance);
+        outputBuffer[floor*2+1]=lineSpace.slice();
+        line.forEach((node, index) => {
+            if (index > 0) {
+                output += space(gap);                
+            }
+            
+            if(node&&node.val!==null){
+                if(node.left){
+                    outputBuffer[floor*2+1][output.length-Math.ceil((gap-startDistance)/4)]="/"
+                }
+                if(node.right){
+                    outputBuffer[floor*2+1][output.length+Math.ceil((gap-startDistance)/4)]="\\"
+                }                                
+                output += val2str(node.val, w);                
+            }else{
+                output += val2str(null, w); 
+            }
+        });
+        outputBuffer[floor*2]=output.split("");
+    });
+    outputBuffer.forEach((line,floor)=>{
+        console.log(line.join(''));
+    });
+    // console.log('outputBuffer',outputBuffer.toString());
+}
+print([1, 2, 3, 4, null, 6, 7, 8, 9, 8, null, 6, 5]);
 if (typeof exports !== 'undefined') {
     module.exports = {
         fromArr,
