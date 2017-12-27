@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>leetcode tree</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="format-detection" content="telephone=no">
+    <script src="./index.js"></script>
+</head>
+
+<body>
+    <main style="max-width:1000px;text-align:center;margin-top:20px;margin:auto;">
+        <input id="input" />
+        <br>
+        <pre id="output" style="text-align:left;display:inline-block;">
+    </main>
+    
+    </pre>
+        <script>
+            const $ = document.querySelector.bind(document);
+            const buffer = getPrintBuffer([1, 2, 3, 4, null, 6, 7, 8, 9, 8, null, 6, 5]);
+
+            function getText(buffer) {
+                let output = "";
+                buffer.forEach((line, floor) => {
+                    output += line.join('');
+                    output += '\n'
+                });
+                return output;
+            }
+            $("#output").textContent = getText(buffer);
+            $("#input").addEventListener("input", () => {
+                try {
+                    const buffer = getPrintBuffer(JSON.parse($("#input").value));
+                    $("#output").textContent = getText(buffer);
+
+                } catch (e) {
+                    console.log(e);
+                }
+            });
+        </script>
+</body>
+
+</html>

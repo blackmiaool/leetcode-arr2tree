@@ -98,7 +98,13 @@ function getAllNodes(tree, treeHeight, width) {
     traverse(tree, 0);
     return allNodes;
 }
-function print(arr) {
+function print(arr) {    
+    const buffer=getPrintBuffer(arr);
+    buffer.forEach((line,floor)=>{
+        console.log(line.join(''));
+    });
+}
+function getPrintBuffer(arr) {
     const tree = fromArr(arr);
     const treeHeight = getHeight(tree);
     const { min, max } = getMaxMin(tree);
@@ -106,7 +112,8 @@ function print(arr) {
     const width = Math.max((min + '').length, (max + '').length);
 
     const allNodes = getAllNodes(tree, treeHeight, width);
-    drawAllNodes(allNodes, treeHeight, width);
+    const buffer=drawAllNodes(allNodes, treeHeight, width);
+    return buffer;
 }
 function space(num) {
     return ' '.repeat(num);
@@ -137,7 +144,7 @@ function drawAllNodes(allNodes, treeHeight, unitWidth) {
         } else {
             startDistance = Math.ceil(times * w + times - 1 + 0.5 - w / 2);
             times *= 2;
-            gap = times * w + (times - 1) + 1 - w;
+            gap = (times-1) * w + times ;
         }
         let output = space(startDistance);
         outputBuffer[floor*2+1]=lineSpace.slice();
@@ -146,12 +153,12 @@ function drawAllNodes(allNodes, treeHeight, unitWidth) {
                 output += space(gap);                
             }
             
-            if(node&&node.val!==null){
+            if(node){
                 if(node.left){
                     outputBuffer[floor*2+1][output.length-Math.ceil((gap-startDistance)/4)]="/"
                 }
                 if(node.right){
-                    outputBuffer[floor*2+1][output.length+Math.ceil((gap-startDistance)/4)]="\\"
+                    outputBuffer[floor*2+1][output.length+w-1+Math.floor((gap-startDistance)/4)]="\\"
                 }                                
                 output += val2str(node.val, w);                
             }else{
@@ -160,12 +167,10 @@ function drawAllNodes(allNodes, treeHeight, unitWidth) {
         });
         outputBuffer[floor*2]=output.split("");
     });
-    outputBuffer.forEach((line,floor)=>{
-        console.log(line.join(''));
-    });
-    // console.log('outputBuffer',outputBuffer.toString());
+    return outputBuffer;
+    
 }
-print([1, 2, 3, 4, null, 6, 7, 8, 9, 8, null, 6, 5]);
+
 if (typeof exports !== 'undefined') {
     module.exports = {
         fromArr,
