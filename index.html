@@ -20,7 +20,8 @@
     </pre>
         <script>
             const $ = document.querySelector.bind(document);
-            const buffer = getPrintBuffer([1, 2, 3, 4, null, 6, 7, 8, 9, 8, null, 6, 5]);
+            const inputStr = `[1, 2, 3, 4, null, 6, 7, 8, 9, 8, null, 6, 5]`;
+            const buffer = getPrintBuffer(JSON.parse(inputStr));
 
             function getText(buffer) {
                 let output = "";
@@ -31,6 +32,7 @@
                 return output;
             }
             $("#output").textContent = getText(buffer);
+            $("#input").value = inputStr;
             $("#input").addEventListener("input", () => {
                 try {
                     const buffer = getPrintBuffer(JSON.parse($("#input").value));
@@ -40,6 +42,7 @@
                     console.log(e);
                 }
             });
+
         </script>
 </body>
 
