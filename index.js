@@ -14,7 +14,7 @@ function fromArr(arr) {
     arr.forEach((val) => {
         const node = new TreeNode(val);
         const cb = cbList.shift();
-        
+
         if (val === null) {
             return;
         }
@@ -72,7 +72,7 @@ function val2str(val, width) {
     val = val + '';
     const spaces = width - val.length;
     if (spaces % 2) {
-        val = ' '.repeat((spaces - 1) / 2) + val + ' '.repeat((spaces + 1) / 2);
+        val = ' '.repeat((spaces + 1) / 2) + val + ' '.repeat((spaces - 1) / 2);
     } else {
         val = ' '.repeat(spaces / 2) + val + ' '.repeat(spaces / 2);
     }
@@ -98,9 +98,9 @@ function getAllNodes(tree, treeHeight, width) {
     traverse(tree, 0);
     return allNodes;
 }
-function print(arr) {    
-    const buffer=getPrintBuffer(arr);
-    buffer.forEach((line,floor)=>{
+function print(arr) {
+    const buffer = getPrintBuffer(arr);
+    buffer.forEach((line, floor) => {
         console.log(line.join(''));
     });
 }
@@ -112,7 +112,7 @@ function getPrintBuffer(arr) {
     const width = Math.max((min + '').length, (max + '').length);
 
     const allNodes = getAllNodes(tree, treeHeight, width);
-    const buffer=drawAllNodes(allNodes, treeHeight, width);
+    const buffer = drawAllNodes(allNodes, treeHeight, width);
     return buffer;
 }
 function space(num) {
@@ -130,9 +130,9 @@ function drawAllNodes(allNodes, treeHeight, unitWidth) {
     //     const zeros = (unitWidth - ret.length) / 2;
     //     return space(Math.ceil(zeros / 2)) + ret + space(Math.floor(zeros / 2));
     // }
-    const outputBuffer=[];
-    const lineLength=Math.pow(2,allNodes.length-1)*(w+1);
-    const lineSpace=space(lineLength).split('');
+    const outputBuffer = [];
+    const lineLength = Math.pow(2, allNodes.length - 1) * (w + 1);
+    const lineSpace = space(lineLength).split('');
     allNodes.forEach((line, floor) => {
         let times = treeHeight - floor - 1 > -1 ? Math.pow(2, treeHeight - floor - 1) : 0;
         // console.log('floor',floor,times);
@@ -144,31 +144,40 @@ function drawAllNodes(allNodes, treeHeight, unitWidth) {
         } else {
             startDistance = Math.ceil(times * w + times - 1 + 0.5 - w / 2);
             times *= 2;
-            gap = (times-1) * w + times ;
+            gap = times * w - w + times;
         }
+        const floorTimes=Math.pow(2,floor);
         let output = space(startDistance);
-        outputBuffer[floor*2+1]=lineSpace.slice();
+        outputBuffer[floor * 2 + 1] = lineSpace.slice();
         line.forEach((node, index) => {
             if (index > 0) {
-                output += space(gap);                
+                output += space(gap);
             }
-            
-            if(node){
-                if(node.left){
-                    outputBuffer[floor*2+1][output.length-Math.ceil((gap-startDistance)/4)]="/"
+
+            if (node) {
+                // if (node.left) {
+                //     outputBuffer[floor * 2 + 1][output.length - Math.ceil((gap - startDistance) / 4)] = "/"
+                // }
+                // if (node.right) {
+                //     outputBuffer[floor * 2 + 1][output.length + Math.ceil((gap - startDistance) / 4)] = "\\"
+                // }
+                const treeBase=output.length+Math.floor(w/2);
+                if (node.left) {
+                    outputBuffer[floor * 2 + 1][treeBase-Math.ceil((times-1)*(w+1)/8)] = "/"
+                    // console.log(output.length,times,output.length+Math.floor(w/2)-times);
                 }
-                if(node.right){
-                    outputBuffer[floor*2+1][output.length+w-1+Math.floor((gap-startDistance)/4)]="\\"
-                }                                
-                output += val2str(node.val, w);                
-            }else{
-                output += val2str(null, w); 
+                if (node.right) {
+                    outputBuffer[floor * 2 + 1][treeBase+Math.ceil((times-1)*(w+1)/8)] = "\\"
+                }
+                output += val2str(node.val, w);
+            } else {
+                output += val2str(null, w);
             }
         });
-        outputBuffer[floor*2]=output.split("");
+        outputBuffer[floor * 2] = output.split("");
     });
     return outputBuffer;
-    
+
 }
 
 if (typeof exports !== 'undefined') {
